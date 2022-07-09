@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,12 +21,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-c773e^f)k-t71_c4+)r16^j%x7t0171gpwodx1apy-gygi2=&#'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-c773e^f)k-t71_c4+)r16^j%x7t0171gpwodx1apy-gygi2=&#')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = str(os.environ.get('DEBUG')) == "1"  # true
 
+ENV_ALLOWED_HOST = os.environ.get('DJANGO_ALLOWED_HOST') or None
 ALLOWED_HOSTS = []
+if ENV_ALLOWED_HOST is not None:
+    ALLOWED_HOSTS = [ ENV_ALLOWED_HOST ]
 
 
 # Application definition
@@ -37,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # 3rd apps
+    'django_extensions',
     'articles',
 ]
 
@@ -77,13 +83,38 @@ WSGI_APPLICATION = 'trydjango.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
+POSTGRES_DB = os.environ.get("POSTGRES_DB")  # db name
+POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD")  # user password
+POSTGRES_USER = os.environ.get("POSTGRES_USER")  # username
+POSTGRES_HOST = os.environ.get("POSTGRES_HOST")  # host
+DB_PORT = os.environ.get("DB_PORT")  # port
+
+POSTGRES_READY = (
+    POSTGRES_DB is not None
+    and POSTGRES_PASSWORD is not None
+    and POSTGRES_USER is not None
+    and POSTGRES_HOST is not None
+    and DB_PORT is not None
+)
+
+if POSTGRES_READY:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": POSTGRES_DB,
+            "USER": POSTGRES_USER,
+            "PASSWORD": POSTGRES_PASSWORD,
+            "HOST": POSTGRES_HOST,
+            "PORT": DB_PORT,
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
