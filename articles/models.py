@@ -14,6 +14,9 @@ class Article(models.Model):
                                null=True,
                                blank=True)
 
+    def get_absolute_url(self):
+        return f'/articles/{self.slug}/'
+
     # Overriding save method
     def save(self, *args, **kwargs):
         # obj = Article.objects.get(id=1)
