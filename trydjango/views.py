@@ -4,6 +4,7 @@ To render html web pages
 from articles.models import Article
 from django.shortcuts import render
 
+
 def home_view(request, *args, **kwargs):
     """
     Take in a request 
