@@ -1,4 +1,5 @@
 import random
+from django.urls import reverse
 from django.db import models
 from django.db.models.signals import pre_save, post_save
 from django.utils.text import slugify
@@ -15,7 +16,8 @@ class Article(models.Model):
                                blank=True)
 
     def get_absolute_url(self):
-        return f'/articles/{self.slug}/'
+        # return f'/articles/{self.slug}/'
+        return reverse("article-detail", kwargs={"slug": self.slug})
 
     # Overriding save method
     def save(self, *args, **kwargs):
