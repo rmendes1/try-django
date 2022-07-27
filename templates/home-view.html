@@ -2,6 +2,8 @@
 
 {% block content %}
 <h1>Article List</h1>
+
+    <a href="{% url 'article-create' %}">Create Article</a>
 <ul>
     {% for item in object_queryset %}
         {% if item.title %}
