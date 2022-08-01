@@ -1,9 +1,12 @@
 import random
+from django.conf import settings
 from django.urls import reverse
 from django.db import models
 from django.db.models import Q
 from django.db.models.signals import pre_save, post_save
 from django.utils.text import slugify
+
+User = settings.AUTH_USER_MODEL  # maps to auth.User
 
 
 class ArticleQuerySet(models.QuerySet):
@@ -24,14 +27,13 @@ class ArticleManager(models.Manager):
 
 
 class Article(models.Model):
+    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
     title = models.CharField(max_length=120)
     slug = models.SlugField(unique=True, blank=True, null=True)
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    publish = models.DateField(auto_now_add=False,
-                               null=True,
-                               blank=True)
+    publish = models.DateField(auto_now_add=False, null=True, blank=True)
 
     objects = ArticleManager()
 
