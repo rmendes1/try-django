@@ -1,8 +1,26 @@
 import random
 from django.urls import reverse
 from django.db import models
+from django.db.models import Q
 from django.db.models.signals import pre_save, post_save
 from django.utils.text import slugify
+
+
+class ArticleQuerySet(models.QuerySet):
+
+    def search(self, query=None):
+        if query is None or query == "":
+            return self.none()  # Article.objects.none() --- []
+        lookups = Q(title__icontains=query) | Q(content__icontains=query)
+        return self.filter().filter(lookups)
+
+
+class ArticleManager(models.Manager):
+    def get_queryset(self):
+        return ArticleQuerySet(self.model, using=self._db)
+
+    def search(self, query=None):
+        return self.get_queryset().search(query=query)
 
 
 class Article(models.Model):
@@ -14,6 +32,8 @@ class Article(models.Model):
     publish = models.DateField(auto_now_add=False,
                                null=True,
                                blank=True)
+
+    objects = ArticleManager()
 
     def get_absolute_url(self):
         # return f'/articles/{self.slug}/'
