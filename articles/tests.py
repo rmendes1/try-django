@@ -16,9 +16,9 @@ class ArticleTestCase(TestCase):
         qs = Article.objects.all()
         self.assertTrue(qs.exists())
 
-    def test_queryset_count(self):
-        qs = Article.objects.all()
-        self.assertEqual(qs.count(), 5)
+    # def test_queryset_count(self):
+    #     qs = Article.objects.all()
+    #     self.assertEqual(qs.count(), 5)
 
     def test_hello_world_slug(self):
         obj = Article.objects.all().order_by("id").first()
@@ -49,3 +49,9 @@ class ArticleTestCase(TestCase):
         slug_list = Article.objects.all().values_list('slug', flat=True)  # gets a list of the values
         unique_slug_list = list(set(slug_list))
         self.assertEqual(len(slug_list), len(unique_slug_list))
+
+    def test_article_search_manager(self):
+        qs = Article.objects.search(query='hello world')
+        self.assertEqual(qs.count(), self.number_of_articles)
+        qs = Article.objects.search(query='something else')
+        self.assertEqual(qs.count(), self.number_of_articles)
