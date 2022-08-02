@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     # 3rd apps
     'django_extensions',
     'articles',
+    'recipes',
 ]
 
 MIDDLEWARE = [
